@@ -5,6 +5,19 @@ app_description = "chai"
 app_email = "chai@gmail.com"
 app_license = "mit"
 
+override_whitelisted_methods = {
+    "api.book_appointment": "medinova.api.book_appointment"
+}
+scheduler_events = {
+    "cron": {
+        "*/5 * * * *": [
+            "medinova.api.auto_free_slots"
+        ]
+    }
+}
+
+
+
 # Apps
 # ------------------
 

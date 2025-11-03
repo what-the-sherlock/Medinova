@@ -1,0 +1,146 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "autoname": "field:practitioner_id",
+ "creation": "2025-10-12 19:52:16.164945",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "basic_details_section",
+  "practitioner_id",
+  "title",
+  "specialization",
+  "email",
+  "column_break_bsgr",
+  "photo",
+  "full_name",
+  "contact_number",
+  "consultation_fee",
+  "consultation_details_section",
+  "consultation_types",
+  "availability_schedule",
+  "calendar_integration",
+  "notes"
+ ],
+ "fields": [
+  {
+   "fieldname": "basic_details_section",
+   "fieldtype": "Section Break",
+   "label": "Basic Details"
+  },
+  {
+   "fieldname": "practitioner_id",
+   "fieldtype": "Data",
+   "label": "Practitioner ID",
+   "unique": 1
+  },
+  {
+   "fieldname": "title",
+   "fieldtype": "Select",
+   "label": "Title",
+   "options": "Dr.\nProf.\nMr.\nMs."
+  },
+  {
+   "fieldname": "specialization",
+   "fieldtype": "Data",
+   "label": "Specialization"
+  },
+  {
+   "fieldname": "email",
+   "fieldtype": "Data",
+   "label": "Email"
+  },
+  {
+   "fieldname": "column_break_bsgr",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "photo",
+   "fieldtype": "Attach",
+   "label": "Photo"
+  },
+  {
+   "fieldname": "full_name",
+   "fieldtype": "Data",
+   "label": "Full Name"
+  },
+  {
+   "fieldname": "contact_number",
+   "fieldtype": "Phone",
+   "label": "Contact Number"
+  },
+  {
+   "fieldname": "consultation_fee",
+   "fieldtype": "Currency",
+   "label": "Consultation fee"
+  },
+  {
+   "fieldname": "consultation_details_section",
+   "fieldtype": "Section Break",
+   "label": "Consultation Details "
+  },
+  {
+   "fieldname": "consultation_types",
+   "fieldtype": "Table",
+   "label": "Consultation types",
+   "options": "Appointment Type"
+  },
+  {
+   "fieldname": "availability_schedule",
+   "fieldtype": "Table",
+   "label": "Availability Schedule",
+   "options": "Practitioner Schedule"
+  },
+  {
+   "fieldname": "calendar_integration",
+   "fieldtype": "Select",
+   "label": "Calendar Integration",
+   "options": "None\nGoogle Calendar\nOutlook"
+  },
+  {
+   "fieldname": "notes",
+   "fieldtype": "Small Text",
+   "label": "Notes"
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2025-10-14 01:03:42.742409",
+ "modified_by": "Administrator",
+ "module": "medinova",
+ "name": "Practitioner",
+ "naming_rule": "By fieldname",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "if_owner": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Administrator",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "row_format": "Dynamic",
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}

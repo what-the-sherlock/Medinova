@@ -1,0 +1,29 @@
+{
+ "attach_print": 0,
+ "channel": "SMS",
+ "condition": "doc.status==\"Booked\"",
+ "creation": "2025-10-16 15:08:18.274719",
+ "days_in_advance": 0,
+ "docstatus": 0,
+ "doctype": "Notification",
+ "document_type": "Make Appointment",
+ "enabled": 1,
+ "event": "Save",
+ "idx": 0,
+ "is_standard": 1,
+ "message": "<h3>Appointment Reminder</h3>\r\n<p>Dear {{ doc.patient }},</p>\r\n<p>This is a friendly reminder for your upcoming appointment with <b>{{ doc.practitioner }}</b>.</p>\r\n<p><b>Date:</b> {{ frappe.utils.formatdate(doc.appointment_date) }}</p>\r\n<p><b>Time:</b> {{ doc.start_time }}</p>\r\n<p>If you need to reschedule, please contact our clinic. We look forward to seeing you!</p>",
+ "message_type": "HTML",
+ "modified": "2025-10-16 15:08:18.274719",
+ "modified_by": "Administrator",
+ "module": "medinova",
+ "name": "Booking SMS",
+ "owner": "Administrator",
+ "recipients": [
+  {
+   "receiver_by_document_field": "owner",
+   "receiver_by_role": "System Manager"
+  }
+ ],
+ "send_system_notification": 0,
+ "send_to_all_assignees": 0
+}

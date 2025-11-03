@@ -1,0 +1,11 @@
+<h3>Appointment Reminder</h3>
+
+<p>Dear {{ doc.patient }},</p>
+
+<p>This is a friendly reminder for your upcoming appointment with <b>{{ doc.practitioner }}</b>.</p>
+
+<p><b>Date:</b> {{ frappe.utils.formatdate(doc.appointment_date) }}</p>
+
+<p><b>Time:</b> {{ doc.start_time }}</p>
+
+<p>If you need to reschedule, please contact our clinic. We look forward to seeing you!</p>

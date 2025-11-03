@@ -1,0 +1,198 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "autoname": "field:encounter_id",
+ "creation": "2025-10-12 22:15:41.035037",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "basic_details_section",
+  "encounter_id",
+  "patient",
+  "encounter_datetime",
+  "column_break_qgbt",
+  "appointment",
+  "practitioner",
+  "specifics_tab",
+  "specific_details_section",
+  "chief_complaint",
+  "vitals",
+  "clinical_notes",
+  "prescriptions",
+  "services_performed",
+  "follow_up_date",
+  "billing_summary_tab",
+  "billing_summary_section",
+  "total_consultation_fee",
+  "total_medicine_cost",
+  "total_service_cost",
+  "grand_total",
+  "payment_status",
+  "payment_records_tab",
+  "payment_record"
+ ],
+ "fields": [
+  {
+   "fieldname": "basic_details_section",
+   "fieldtype": "Section Break",
+   "label": "Basic Details"
+  },
+  {
+   "fieldname": "encounter_id",
+   "fieldtype": "Data",
+   "label": "Encounter ID",
+   "unique": 1
+  },
+  {
+   "fetch_from": "appointment.patient",
+   "fieldname": "patient",
+   "fieldtype": "Link",
+   "label": "Patient",
+   "options": "Patient"
+  },
+  {
+   "fieldname": "encounter_datetime",
+   "fieldtype": "Datetime",
+   "label": "Encounter Datetime"
+  },
+  {
+   "fieldname": "column_break_qgbt",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "appointment",
+   "fieldtype": "Link",
+   "label": "Appointment",
+   "options": "Make Appointment"
+  },
+  {
+   "fetch_from": "appointment.practitioner",
+   "fieldname": "practitioner",
+   "fieldtype": "Link",
+   "label": "Practitioner",
+   "options": "Practitioner"
+  },
+  {
+   "fieldname": "specific_details_section",
+   "fieldtype": "Section Break",
+   "label": "Specific Details"
+  },
+  {
+   "fieldname": "chief_complaint",
+   "fieldtype": "Small Text",
+   "label": "Chief Complaint"
+  },
+  {
+   "fieldname": "vitals",
+   "fieldtype": "Table",
+   "label": "Vitals",
+   "options": "Vitals"
+  },
+  {
+   "fieldname": "clinical_notes",
+   "fieldtype": "Small Text",
+   "label": "Clinical Notes"
+  },
+  {
+   "fieldname": "prescriptions",
+   "fieldtype": "Table",
+   "label": "Prescriptions",
+   "options": "Prescription"
+  },
+  {
+   "fieldname": "follow_up_date",
+   "fieldtype": "Date",
+   "label": "Follow up date"
+  },
+  {
+   "fieldname": "specifics_tab",
+   "fieldtype": "Tab Break",
+   "label": "Specifics"
+  },
+  {
+   "fieldname": "payment_records_tab",
+   "fieldtype": "Tab Break",
+   "label": "Payment Records"
+  },
+  {
+   "fieldname": "services_performed",
+   "fieldtype": "Table",
+   "label": "Services and Investigations",
+   "options": "Performed Service"
+  },
+  {
+   "fieldname": "billing_summary_tab",
+   "fieldtype": "Tab Break",
+   "label": "Billing Summary"
+  },
+  {
+   "fieldname": "billing_summary_section",
+   "fieldtype": "Section Break",
+   "label": "Billing Summary"
+  },
+  {
+   "fieldname": "total_consultation_fee",
+   "fieldtype": "Currency",
+   "label": "Total Consultation Fee",
+   "read_only": 1
+  },
+  {
+   "fieldname": "total_medicine_cost",
+   "fieldtype": "Currency",
+   "label": "Total Medicine Cost",
+   "read_only": 1
+  },
+  {
+   "fieldname": "total_service_cost",
+   "fieldtype": "Currency",
+   "label": "Total Service Cost",
+   "read_only": 1
+  },
+  {
+   "fieldname": "grand_total",
+   "fieldtype": "Currency",
+   "label": "Grand Total",
+   "read_only": 1
+  },
+  {
+   "default": "Pending",
+   "fieldname": "payment_status",
+   "fieldtype": "Select",
+   "label": "Payment Status",
+   "options": "Pending\nPaid"
+  },
+  {
+   "fieldname": "payment_record",
+   "fieldtype": "Link",
+   "label": "Payment Record",
+   "options": "Encounter Payment"
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2025-10-28 12:56:02.064558",
+ "modified_by": "Administrator",
+ "module": "medinova",
+ "name": "Patient Encounter",
+ "naming_rule": "By fieldname",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "row_format": "Dynamic",
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}
