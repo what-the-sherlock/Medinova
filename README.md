@@ -1,34 +1,8 @@
-### medinova
-
-chai
-
-### Installation
-
-You can install this app using the [bench](https://github.com/frappe/bench) CLI:
-
-```bash
-cd $PATH_TO_YOUR_BENCH
-bench get-app $URL_OF_THIS_REPO --branch develop
-bench install-app medinova
-```
-
-### Contributing
-
-This app uses `pre-commit` for code formatting and linting. Please [install pre-commit](https://pre-commit.com/#installation) and enable it for this repository:
-
-```bash
-cd apps/medinova
-pre-commit install
-```
-
-Pre-commit is configured to use the following tools for checking and formatting your code:
-
-- ruff
-- eslint
-- prettier
-- pyupgrade
-
-### License
-
-mit
-# Medinova
+Medinova- custom healthcare module built on frappe framework
+ 1. Built a custom healthcare management system using Frappe (Python, JS, MariaDB) with dynamic
+ appointment scheduling and automated billing workflows.
+ 2. Integrated AI-powered clinical summaries via Google Gemini API for smart patient insights.
+ 3. Developed a patient portal and analytics dashboard for seamless booking, payment, and real-time
+ reporting.
+ 4. Chatbot to book appointments directly, reports, dashboard, patient encounter features, etc. are some other
+ notable features. 
