@@ -111,8 +111,6 @@ def process_mock_payment(encounter_name):
     return {
         "payment_name": payment.name
     }
-    
-import frappe
 
 @frappe.whitelist()
 def calculate_encounter_bill(encounter_name):
@@ -146,3 +144,248 @@ def calculate_encounter_bill(encounter_name):
     return {
         "grand_total": grand_total
     }
+    
+    
+    
+# ------------------------------------------------
+
+from frappe.model.document import Document
+import frappe
+import google.generativeai as genai
+
+@frappe.whitelist()
+def summarize_clinical_notes(encounter_name):
+    doc = frappe.get_doc("Patient Encounter", encounter_name)
+
+    if not doc.clinical_notes:
+        msg = "No clinical notes to summarize."
+        doc.db_set('ai_summary', msg)
+        return msg
+
+    api_key = frappe.conf.get("gemini_api_key")
+    if not api_key:
+        msg = "Error: Gemini API key not set in site_config.json."
+        frappe.log_error(msg, "AI Agent Error")
+        doc.db_set('ai_summary', msg)
+        return msg
+
+    try:
+        
+        genai.configure(api_key=api_key)
+
+        model = genai.GenerativeModel("models/gemini-2.5-pro")
+
+        # 🧠 Enhanced instruction prompt
+        prompt = f"""
+        You are an expert medical language model assisting doctors.
+        The following are rough, shorthand, or incomplete clinical notes written in a hurry.
+
+        Your task:
+        1. Interpret unclear medical shorthand or abbreviations.
+        2. Expand them into clear, full sentences using accurate clinical language.
+        3. Maintain the original meaning.
+        4. Then summarize the key findings in 3–4 concise bullet points.
+
+        Example Input:
+        "pt c/o chest pain since morn. bp high. r/o cardiac."
+        Example Output:
+        "The patient complained of chest pain since the morning and had elevated blood pressure. Cardiac causes are to be ruled out."
+        Summary:
+        - Presented with chest pain and high BP
+        - Possible cardiac cause under evaluation
+
+        Clinical Notes:
+        {doc.clinical_notes}
+
+        Output:
+        """
+
+        response = model.generate_content(prompt)
+        summary = response.text.strip()
+
+
+        summary = summary[:1400]
+
+        doc.db_set('ai_summary', summary)
+        return summary
+
+    except Exception as e:
+        error_msg = f"Error: Gemini summarization failed. {str(e)}"
+        frappe.log_error(error_msg, "AI Agent Error")
+        doc.db_set('ai_summary', error_msg)
+        return error_msg
+
+#-------------------------------------------------------------------------
+
+import frappe
+import google.generativeai as genai
+from frappe.utils import nowdate
+import re, json
+
+@frappe.whitelist()
+def get_slots_from_natural_language(message, conversation_history):
+    """
+    Uses Gemini to interpret the user's message, extract entities, and return available slots.
+    Also supports recognizing requests like "Show my last appointment".
+    """
+    api_key = frappe.conf.get("gemini_api_key")
+    if not api_key:
+        frappe.throw("Gemini API key is not set in site_config.json.")
+
+    try:
+        genai.configure(api_key=api_key)
+        model = genai.GenerativeModel("models/gemini-2.5-flash")
+
+        practitioners = frappe.get_all("Practitioner", fields=["name", "specialization"])
+        appointment_types = frappe.get_all("Appointment Type", fields=["type_name"])
+
+        prompt = f"""
+        You are a medical appointment scheduling assistant.
+        Today's date is {nowdate()}.
+
+        Recognize what the user wants:
+        - If they want to book an appointment, extract:
+          1️⃣ practitioner — by name or specialization
+          2️⃣ appointment_type
+          3️⃣ appointment_date (convert words like 'tomorrow' to YYYY-MM-DD)
+        - If the user asks for their "last appointment" or "my recent booking",
+          just reply with the keyword: LAST_APPOINTMENT
+        - If the user asks for "appointments this week" or "upcoming appointments",
+          reply with the keyword: UPCOMING_APPOINTMENTS
+
+        Available practitioners: {practitioners}
+        Appointment types: {appointment_types}
+        Conversation so far: {conversation_history}
+        Latest user message: "{message}"
+
+        Respond ONLY in one of these formats:
+        - If booking intent detected and all info found:
+          {{ "practitioner": "PR001", "appointment_type": "Dental Cleanup", "appointment_date": "2025-11-17" }}
+        - If info missing: ask ONE follow-up question.
+        - If they want last appointment: output ONLY LAST_APPOINTMENT
+        - If they want upcoming appointments: output ONLY UPCOMING_APPOINTMENTS
+        """
+
+        response = model.generate_content(prompt)
+        ai_response = response.text.strip()
+
+    except Exception as e:
+        frappe.log_error(f"Gemini NLU Error: {e}", "AI Chatbot Error")
+        return {"message": f"AI understanding failed: {str(e)}"}
+
+
+    try:
+        # Handle special keywords first
+        if ai_response == "LAST_APPOINTMENT":
+            return get_last_appointment()
+        elif ai_response == "UPCOMING_APPOINTMENTS":
+            return get_upcoming_appointments()
+
+        # Try to extract JSON even if wrapped in text
+        match = re.search(r"\{.*\}", ai_response, re.DOTALL)
+        if match:
+            entities = frappe.parse_json(match.group(0))
+        else:
+            entities = None
+
+        if not entities:
+            return {"message": ai_response}
+
+        # Ensure all fields exist
+        required = ["practitioner", "appointment_type", "appointment_date"]
+        if not all(k in entities for k in required):
+            return {"message": "I need a bit more info — please specify the doctor or date."}
+
+        # ✅ Get available slots from your custom API
+        slots = frappe.call("medinova.api.get_available_start_times", **entities)
+        if not slots.get("available_slots"):
+            return {"message": f"Sorry, no slots available for {entities['practitioner']} on {entities['appointment_date']}."}
+
+        return {"slots": slots.get("available_slots"), "entities": entities}
+
+    except Exception as e:
+        frappe.log_error(f"AI Parse Error: {e}\nResponse: {ai_response}", "AI Chatbot Error")
+        return {"message": "I had trouble interpreting that — please rephrase your request."}
+
+
+@frappe.whitelist()
+def create_appointment_from_chat(patient_name, practitioner, appointment_date, start_time, appointment_type):
+    """Creates appointment safely and logs errors."""
+    try:
+        patient_id = (
+            frappe.db.get_value("Patient", {"full_name": patient_name})
+            or frappe.db.get_value("Patient", {"email": frappe.session.user})
+            or frappe.db.get_value("Patient", {"owner": frappe.session.user})
+        )
+        if not patient_id:
+            frappe.throw(f"No patient found for {patient_name} or {frappe.session.user}")
+
+        data = {
+            "doctype": "Make Appointment",
+            "patient": patient_id,
+            "practitioner": practitioner,
+            "appointment_date": appointment_date,
+            "start_time": start_time,
+            "appointment_type": appointment_type,
+            "booking_channel": "Patient Portal",
+            "status": "Booked"
+        }
+
+        appt = frappe.get_doc(data)
+        appt.insert(ignore_permissions=True)
+        frappe.db.commit()
+
+        return {
+            "success": True,
+            "appointment_name": appt.name,
+            "message": f"✅ You’re all booked! Your appointment ID is <b>{appt.name}</b>."
+        }
+
+    except Exception as e:
+        frappe.log_error(frappe.get_traceback(), "Chatbot Booking Failed (Debug)")
+        return {"error": f"Sorry, I couldn’t finalize the booking. Error: {str(e)}"}
+
+
+def get_last_appointment():
+    """Fetches the most recent appointment for the logged-in user."""
+    email = frappe.session.user
+    patient_id = frappe.db.get_value("Patient", {"email": email}) or frappe.db.get_value("Patient", {"owner": email})
+    if not patient_id:
+        return {"message": "I couldn’t find any appointments linked to your account."}
+
+    last_appt = frappe.db.get_all(
+        "Make Appointment",
+        filters={"patient": patient_id},
+        fields=["name", "appointment_date", "appointment_type", "practitioner", "status"],
+        order_by="creation desc",
+        limit=1
+    )
+
+    if not last_appt:
+        return {"message": "You don’t have any past appointments yet."}
+
+    appt = last_appt[0]
+    return {"message": f"🕓 Your last appointment was a <b>{appt.appointment_type}</b> with <b>{appt.practitioner}</b> on <b>{appt.appointment_date}</b>. Status: <b>{appt.status}</b>."}
+
+
+def get_upcoming_appointments():
+    """Fetches all future appointments for the logged-in patient."""
+    email = frappe.session.user
+    patient_id = frappe.db.get_value("Patient", {"email": email}) or frappe.db.get_value("Patient", {"owner": email})
+    if not patient_id:
+        return {"message": "No appointments found for your account."}
+
+    records = frappe.db.get_all(
+        "Make Appointment",
+        filters={"patient": patient_id, "appointment_date": [">=", nowdate()]},
+        fields=["appointment_date", "appointment_type", "practitioner", "status"],
+        order_by="appointment_date asc"
+    )
+
+    if not records:
+        return {"message": "You have no upcoming appointments."}
+
+    message = "📅 <b>Your upcoming appointments:</b><br>"
+    for r in records:
+        message += f"- {r.appointment_date}: {r.appointment_type} with {r.practitioner} ({r.status})<br>"
+    return {"message": message}

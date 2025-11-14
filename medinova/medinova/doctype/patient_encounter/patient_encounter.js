@@ -60,5 +60,19 @@ frappe.ui.form.on('Patient Encounter', {
                  console.log("Reason: Document status is not Draft (0). It is:", frm.doc.docstatus);
              }
         }
+        if (!frm.is_new() && frm.doc.clinical_notes) {
+            frm.add_custom_button(__('Generate AI Summary'), function() {
+                frm.set_value('ai_summary', 'Generating summary, please wait...');
+                frappe.call({
+                    method: 'medinova.api.summarize_clinical_notes',
+                    args: {
+                        encounter_name: frm.doc.name
+                    },
+                    callback: function(r) {
+                        frm.reload_doc(); // Reload to show the new summary
+                    }
+                });
+            });
+        }
     }
 });

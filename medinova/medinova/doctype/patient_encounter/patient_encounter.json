@@ -21,6 +21,7 @@
   "prescriptions",
   "services_performed",
   "follow_up_date",
+  "ai_summary",
   "billing_summary_tab",
   "billing_summary_section",
   "total_consultation_fee",
@@ -166,12 +167,18 @@
    "fieldtype": "Link",
    "label": "Payment Record",
    "options": "Encounter Payment"
+  },
+  {
+   "fieldname": "ai_summary",
+   "fieldtype": "Small Text",
+   "label": "AI Summary",
+   "read_only": 1
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-10-28 12:56:02.064558",
+ "modified": "2025-11-06 22:42:47.776689",
  "modified_by": "Administrator",
  "module": "medinova",
  "name": "Patient Encounter",

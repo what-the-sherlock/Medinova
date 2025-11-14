@@ -1,7 +1,7 @@
 {
  "actions": [],
  "allow_rename": 1,
- "autoname": "field:appointment_id",
+ "autoname": "naming_series:",
  "creation": "2025-10-12 22:09:25.680659",
  "doctype": "DocType",
  "engine": "InnoDB",
@@ -22,7 +22,8 @@
   "appointment_date",
   "end_time",
   "booking_channel",
-  "invoice"
+  "invoice",
+  "naming_series"
  ],
  "fields": [
   {
@@ -127,16 +128,22 @@
    "fieldname": "email",
    "fieldtype": "Data",
    "label": "Email"
+  },
+  {
+   "fieldname": "naming_series",
+   "fieldtype": "Select",
+   "label": "Naming Series",
+   "options": "MA-.#####"
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-10-16 23:49:09.062074",
+ "modified": "2025-11-07 00:20:30.403811",
  "modified_by": "Administrator",
  "module": "medinova",
  "name": "Make Appointment",
- "naming_rule": "By fieldname",
+ "naming_rule": "By \"Naming Series\" field",
  "owner": "Administrator",
  "permissions": [
   {
